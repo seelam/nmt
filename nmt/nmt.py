@@ -13,8 +13,12 @@
 # limitations under the License.
 # ==============================================================================
 
+
+
 """TensorFlow NMT model implementation."""
 from __future__ import print_function
+
+import ddl
 
 import argparse
 import os
@@ -30,6 +34,8 @@ from . import train
 from .utils import evaluation_utils
 from .utils import misc_utils as utils
 from .utils import vocab_utils
+
+
 
 utils.check_tensorflow_version()
 
@@ -542,8 +548,9 @@ def create_or_load_hparams(
 def run_main(flags, default_hparams, train_fn, inference_fn, target_session=""):
   """Run main."""
   # Job
-  jobid = flags.jobid
-  num_workers = flags.num_workers
+  #jobid = flags.jobid
+  jobid = ddl.rank() # for ddl to enforce data partitioning
+  num_workers = flags.num_workers # must be 1 for ddl
   utils.print_out("# Job id %d" % jobid)
 
   # Random
@@ -552,6 +559,7 @@ def run_main(flags, default_hparams, train_fn, inference_fn, target_session=""):
     utils.print_out("# Set random seed to %d" % random_seed)
     random.seed(random_seed + jobid)
     np.random.seed(random_seed + jobid)
+    tf.set_random_seed(random_seed + jobid)
 
   ## Train / Decode
   out_dir = flags.out_dir

@@ -125,7 +125,8 @@ class BaseModel(object):
       self.predict_count = tf.reduce_sum(
           self.iterator.target_sequence_length)
 
-    self.global_step = tf.Variable(0, trainable=False)
+    #GJ18 added name
+    self.global_step = tf.Variable(0, trainable=False, name='global_step')
     params = tf.trainable_variables()
 
     # Gradients and SGD update operation for training the model.
